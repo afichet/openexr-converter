@@ -33,3 +33,34 @@ cmake ..
 make
 ```
 
+This will generate into a directory `bin`, the executable, `openexr-converter`.
+
+Usage
+=====
+
+```
+   openexr-converter  [-a] -o <string> -i <string> [--] [--version]
+                      [-h]
+```
+
+Where: 
+
+```
+   -a,  --ignore-alpha
+     Ignore alpha channel
+
+   -o <string>,  --output <string>
+     (required)  Set file to save to
+
+   -i <string>,  --input <string>
+     (required)  Set file to convert
+
+   --,  --ignore_rest
+     Ignores the rest of the labeled arguments following this flag.
+
+   --version
+     Displays version information and exits.
+
+   -h,  --help
+     Displays usage information and exits.
+```
