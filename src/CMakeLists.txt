@@ -18,4 +18,4 @@ target_link_libraries(openexr-converter
 	)
 
 install (TARGETS openexr-converter
-	DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+		RUNTIME DESTINATION bin)
