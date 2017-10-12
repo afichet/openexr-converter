@@ -33,7 +33,13 @@ cmake ..
 make
 ```
 
-This will generate into a directory `bin`, the executable, `openexr-converter`.
+After compilation the executable, `openexr-converter` will be created in `src` folder.
+
+To install, do:
+
+```
+sudo make install
+```
 
 Usage
 =====
