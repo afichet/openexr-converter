@@ -1,5 +1,4 @@
 #include <OpenEXR/ImfRgbaFile.h>
-#include <OpenEXR/ImfArray.h>
 #include <lodepng.h>
 #include <tclap/CmdLine.h>
 #include <iostream>
@@ -12,6 +11,10 @@ inline double to_sRGB(double rgb_color) {
         return 12.92 * rgb_color;
     else
         return (1.0 + a) * std::pow(rgb_color, 1.0 / 2.4) - a;
+}
+
+inline double gamma_correction(double rgb_color, double gamma) {
+	return std::pow(rgb_color, 1.0/gamma);
 }
 
 int main(int argc, char *argv[]) {
@@ -31,7 +34,7 @@ int main(int argc, char *argv[]) {
 		("a", "ignore-alpha",
 		 "Ignore alpha channel",
 		 false);
-	TCLAP::ValueArg<double> gammaCorreciton
+	TCLAP::ValueArg<double> gammaCorrection
 		("g", "gamma",
 		 "Set the gamma correction (default sRGB)",
 		 false, 1.0, "real");
@@ -39,44 +42,58 @@ int main(int argc, char *argv[]) {
     cmd.add(inputFile);
     cmd.add(outputFile);
 	cmd.add(ignoreAlpha);
-	//cmd.add(gammaCorreciton);
+	cmd.add(gammaCorrection);
 	cmd.parse(argc, argv);
 	
     // Load the OpenEXR file
-    Imf::Array2D<Imf::Rgba> pixels;
     Imf::RgbaInputFile file(inputFile.getValue().c_str());
     Imath::Box2i dw = file.dataWindow();
     int width = dw.max.x - dw.min.x + 1;
     int height = dw.max.y - dw.min.y + 1;
 
-    pixels.resizeErase(height, width);
-    file.setFrameBuffer(&pixels[0][0] - dw.min.x - dw.min.y * width, 1, width);
+	std::vector<Imf::Rgba> pixels_exr(width * height);
+    file.setFrameBuffer(&pixels_exr[0] - dw.min.x - dw.min.y * width, 1, width);
     file.readPixels(dw.min.y, dw.max.y);
 
     // Create the data for PNG output
-    std::vector<unsigned char> image;
-    image.resize(width * height * 4);
+    std::vector<unsigned char> pixels_png(width * height * 4);
 
-    // Transform colors to 8bit sRGB
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-			image[4 * width * y + 4 * x + 0] =
-				(unsigned char)(to_sRGB(clamp((double)(pixels[y][x].r), 0.0, 1.0)) * 255.0);
-			image[4 * width * y + 4 * x + 1] =
-				(unsigned char)(to_sRGB(clamp((double)(pixels[y][x].g), 0.0, 1.0)) * 255.0);
-			image[4 * width * y + 4 * x + 2] =
-				(unsigned char)(to_sRGB(clamp((double)(pixels[y][x].b), 0.0, 1.0)) * 255.0);
+	if (gammaCorrection.isSet()) {
+		double gammaValue = gammaCorrection.getValue();
+		// Transform colors to 8bit sRGB
+		for (int i = 0; i < width * height; i++) {
+			pixels_png[4 * i + 0] =
+				(unsigned char)(gamma_correction(clamp((double)(pixels_exr[i].r), 0.0, 1.0), gammaValue) * 255.0);
+			pixels_png[4 * i + 1] =
+				(unsigned char)(gamma_correction(clamp((double)(pixels_exr[i].g), 0.0, 1.0), gammaValue) * 255.0);
+			pixels_png[4 * i + 2] =
+				(unsigned char)(gamma_correction(clamp((double)(pixels_exr[i].b), 0.0, 1.0), gammaValue) * 255.0);
 			if (ignoreAlpha.getValue()) {
-				image[4 * width * y + 4 * x + 3] = 0xFF;
+				pixels_png[4 * i + 3] = 0xFF;
 			} else {
-				image[4 * width * y + 4 * x + 0] =
-				(unsigned char)(to_sRGB(clamp((double)(pixels[y][x].a), 0.0, 1.0)) * 255.0);
+				pixels_png[4 * i + 3] =
+					(unsigned char)(clamp((double)(pixels_exr[i].a), 0.0, 1.0) * 255.0);
 			}
-        }
-    }
+		}
+	} else {
+		// Transform colors to 8bit sRGB
+		for (int i = 0; i < width * height; i++) {
+			pixels_png[4 * i + 0] =
+				(unsigned char)(to_sRGB(clamp((double)(pixels_exr[i].r), 0.0, 1.0)) * 255.0);
+			pixels_png[4 * i + 1] =
+				(unsigned char)(to_sRGB(clamp((double)(pixels_exr[i].g), 0.0, 1.0)) * 255.0);
+			pixels_png[4 * i + 2] =
+				(unsigned char)(to_sRGB(clamp((double)(pixels_exr[i].b), 0.0, 1.0)) * 255.0);
+			if (ignoreAlpha.getValue()) {
+				pixels_png[4 * i + 3] = 0xFF;
+			} else {
+				pixels_png[4 * i + 3] =
+					(unsigned char)(clamp((double)(pixels_exr[i].a), 0.0, 1.0) * 255.0);
+			}
+		}
+	}
 
-    unsigned error = lodepng::encode(outputFile.getValue(), image, width, height);
-
+	unsigned error = lodepng::encode(outputFile.getValue(), pixels_png, width, height);
 	if (error)
 		std::cout << "encoder error " << error
 				  << ": "<< lodepng_error_text(error) << std::endl;
