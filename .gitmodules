@@ -1,0 +1,6 @@
+[submodule "3rdparty/tclap-code"]
+	path = 3rdparty/tclap-code
+	url = git://git.code.sf.net/p/tclap/code
+[submodule "3rdparty/lodepng"]
+	path = 3rdparty/lodepng
+	url = https://github.com/lvandeve/lodepng.git
