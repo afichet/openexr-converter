@@ -7,5 +7,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 add_definitions ("-Wall")
 add_definitions ("-Dcimg_OS=0")
 
+include_directories(
+	"3rdparty/tclap-code/include"
+	"3rdparty/lodepng"
+	)
+
 add_subdirectory(src)
 
