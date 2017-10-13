@@ -1,7 +1,7 @@
 OpenEXR converter
 =================
 
-This tools in a simple utility to convert images files from OpenEXR to PNG 8bit sRGB files.
+These tools are simple utilities to convert images files from OpenEXR to PNG 8bit sRGB files and TIFF to OpenEXR.
 
 Compilation
 ===========
@@ -9,18 +9,19 @@ Compilation
 Dependencies
 ------------
 You need to install OpenEXR to compile the tool:
-* libopenexr-dev
+* libopenexr
+* libtiff
 
 ### Ubuntu 16.04 LTS
 
 ```
-sudo apt install libopenexr-dev
+sudo apt install libopenexr-dev libtiff5-dev
 ```
 
 ### Arch Linux
 
 ```
-sudo pacman -S openexr
+sudo pacman -S openexr libtiff
 ```
 
 ### Compilation
@@ -33,7 +34,9 @@ cmake ..
 make
 ```
 
-After compilation the executable, `openexr-converter` will be created in `src` folder.
+After compilation,
+* `exr-png` will be created in `src/exr-png` folder.
+* `tiff-exr` will be created in `src/tiff-exr` folder.
 
 To install, do:
 
@@ -44,14 +47,20 @@ sudo make install
 Usage
 =====
 
+OpenEXR to PNG
+--------------
+
 ```
-   openexr-converter  [-a] -o <string> -i <string> [--] [--version]
-                      [-h]
+exr-png  [-g <real>] [-a] -o <string> -i <string> [--] [--version]
+		 [-h]
 ```
 
 Where: 
 
 ```
+   -g <real>,  --gamma <real>
+     Set the gamma correction (default sRGB)
+
    -a,  --ignore-alpha
      Ignore alpha channel
 
@@ -69,4 +78,12 @@ Where:
 
    -h,  --help
      Displays usage information and exits.
+```
+
+
+TIFF to OpenEXR
+---------------
+
+```
+tiff-exr <input_tiff_file> <output_exr_file>
 ```
