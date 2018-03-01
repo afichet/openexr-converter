@@ -3,6 +3,15 @@ OpenEXR converter
 
 These tools are simple utilities to convert images files from OpenEXR to PNG 8bit sRGB files and TIFF to OpenEXR.
 
+Checking out the repository
+===========================
+
+```
+git clone git@github.com:yama-chan/openexr-converter.git
+git submodule init
+git submodule update
+```
+
 Compilation
 ===========
 
