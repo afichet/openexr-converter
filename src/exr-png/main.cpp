@@ -38,11 +38,16 @@ int main(int argc, char *argv[]) {
 		("g", "gamma",
 		 "Set the gamma correction (default sRGB)",
 		 false, 1.0, "real");
+	TCLAP::ValueArg<double> exposure
+		("e", "exposure",
+		 "Set the exposure",
+		 false, 0.0, "real");
 	
     cmd.add(inputFile);
     cmd.add(outputFile);
 	cmd.add(ignoreAlpha);
 	cmd.add(gammaCorrection);
+    cmd.add(exposure);
 	cmd.parse(argc, argv);
 	
     // Load the OpenEXR file
@@ -58,16 +63,18 @@ int main(int argc, char *argv[]) {
     // Create the data for PNG output
     std::vector<unsigned char> pixels_png(width * height * 4);
 
+    double exposureMul = pow(2.0, exposure.getValue());
+    
 	if (gammaCorrection.isSet()) {
 		double gammaValue = gammaCorrection.getValue();
 		// Transform colors to 8bit sRGB
 		for (int i = 0; i < width * height; i++) {
 			pixels_png[4 * i + 0] =
-				(unsigned char)(gamma_correction(clamp((double)(pixels_exr[i].r), 0.0, 1.0), gammaValue) * 255.0);
+				(unsigned char)(gamma_correction(clamp((double)(pixels_exr[i].r) * exposureMul, 0.0, 1.0), gammaValue) * 255.0);
 			pixels_png[4 * i + 1] =
-				(unsigned char)(gamma_correction(clamp((double)(pixels_exr[i].g), 0.0, 1.0), gammaValue) * 255.0);
+				(unsigned char)(gamma_correction(clamp((double)(pixels_exr[i].g) * exposureMul, 0.0, 1.0), gammaValue) * 255.0);
 			pixels_png[4 * i + 2] =
-				(unsigned char)(gamma_correction(clamp((double)(pixels_exr[i].b), 0.0, 1.0), gammaValue) * 255.0);
+				(unsigned char)(gamma_correction(clamp((double)(pixels_exr[i].b) * exposureMul, 0.0, 1.0), gammaValue) * 255.0);
 			if (ignoreAlpha.getValue()) {
 				pixels_png[4 * i + 3] = 0xFF;
 			} else {
@@ -79,11 +86,11 @@ int main(int argc, char *argv[]) {
 		// Transform colors to 8bit sRGB
 		for (int i = 0; i < width * height; i++) {
 			pixels_png[4 * i + 0] =
-				(unsigned char)(to_sRGB(clamp((double)(pixels_exr[i].r), 0.0, 1.0)) * 255.0);
+				(unsigned char)(to_sRGB(clamp((double)(pixels_exr[i].r) * exposureMul, 0.0, 1.0)) * 255.0);
 			pixels_png[4 * i + 1] =
-				(unsigned char)(to_sRGB(clamp((double)(pixels_exr[i].g), 0.0, 1.0)) * 255.0);
+				(unsigned char)(to_sRGB(clamp((double)(pixels_exr[i].g) * exposureMul, 0.0, 1.0)) * 255.0);
 			pixels_png[4 * i + 2] =
-				(unsigned char)(to_sRGB(clamp((double)(pixels_exr[i].b), 0.0, 1.0)) * 255.0);
+				(unsigned char)(to_sRGB(clamp((double)(pixels_exr[i].b) * exposureMul, 0.0, 1.0)) * 255.0);
 			if (ignoreAlpha.getValue()) {
 				pixels_png[4 * i + 3] = 0xFF;
 			} else {
