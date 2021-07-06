@@ -1,5 +1,13 @@
 project(tiff-exr)
-find_package(OpenEXR REQUIRED)
+find_package(OpenEXR CONFIG)
+
+if (NOT OpenEXR_FOUND)
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake/")
+	find_package(OpenEXR REQUIRED)
+else ()
+	set(OPENEXR_LIBRARIES OpenEXR::OpenEXR Imath::Imath Threads::Threads)
+endif ()
+
 find_package(TIFF REQUIRED)
 
 add_executable(tiff-exr
