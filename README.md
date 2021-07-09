@@ -5,7 +5,7 @@ This repository is currently not maintained and after knowing much better the Op
 - No support for displayWindow
 - No support for chromaticities
 
-If you want to use the proper tool, I recommend using OpenIO tools: https://openimageio.readthedocs.io/en/v2.2.15.1/oiiotool.html
+If you want to use the proper tool, I recommend using OpenImageIO tools: https://openimageio.readthedocs.io/en/v2.2.15.1/oiiotool.html
 
 So, take this repo with a grain of salt, an example on how to read OpenEXR images using the OpenEXR library, not as the state of the art.
 
