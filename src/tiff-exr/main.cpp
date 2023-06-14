@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
                 for (int c = 0; c < spp; c++) {
                     for (uint32_t row = 0; row < h; row++) {
                         TIFFReadScanline(tif, buf, row, c);
-                        uint8_t *scanline = (uint8_t*)buf;
+                        uint16_t *scanline = (uint16_t*)buf;
                         for (uint32_t col = 0; col < w; col++) {
                             // Write to PNG
                             //image[4 * (row * w + col) + c] = scanline[spp * col + c] / 65535.0f;
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
                 for (int c = 0; c < spp; c++) {
                     for (uint32_t row = 0; row < h; row++) {
                         TIFFReadScanline(tif, buf, row, c);
-                        uint8_t *scanline = (uint8_t*)buf;
+                        uint32_t *scanline = (uint32_t*)buf;
                         for (uint32_t col = 0; col < w; col++) {
                             // Write to PNG
                             //image[4 * (row * w + col) + c] = scanline[spp * col + c] / 16777216;;
