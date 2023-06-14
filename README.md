@@ -19,8 +19,7 @@ Checking out the repository
 
 ```
 git clone git@github.com:yama-chan/openexr-converter.git
-git submodule init
-git submodule update
+git submodule update --init --recursive
 ```
 
 Compilation
@@ -75,7 +74,7 @@ exr-png  [-g <real>] [-a] -o <string> -i <string> [--] [--version]
 		 [-h]
 ```
 
-Where: 
+Where:
 
 ```
    -g <real>,  --gamma <real>
