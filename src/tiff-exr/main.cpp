@@ -9,6 +9,18 @@
 #include <OpenEXR/ImfRgbaFile.h>
 
 
+inline double to_linear_RGB(double rgb_color)
+{
+    const double a = 0.055;
+
+    if (rgb_color <= 0.04045) {
+        return rgb_color / 12.92;
+    } else {
+        return std::pow((rgb_color + a) / (1.0 + a), 2.4);
+    }
+}
+
+
 void writeRgba(const char filename[], const Imf::Rgba* pixels, int width, int height)
 {
     Imf::RgbaOutputFile file(filename, width, height, Imf::WRITE_RGBA);
@@ -67,14 +79,12 @@ int main(int argc, char *argv[])
                         if (spp >= 3) {
                             for (int c = 0; c < spp; c++) {
                                 // Write to EXR
-                                // TODO: Convert sRGB to Linear RGB
-                                channels[c] = (half)scanline[spp * col + c] / (half)std::numeric_limits<uint8_t>::max();
+                                channels[c] = to_linear_RGB((half)scanline[spp * col + c] / (half)std::numeric_limits<uint8_t>::max());
                             }
                         } else {
                             for (int c = 0; c < 3; c++) {
                                 // Write to EXR
-                                // TODO: Convert sRGB to Linear RGB
-                                channels[c] = (half)scanline[spp * col] / (half)std::numeric_limits<uint8_t>::max();
+                                channels[c] = to_linear_RGB((half)scanline[spp * col] / (half)std::numeric_limits<uint8_t>::max());
                             }
                         }
                     }
