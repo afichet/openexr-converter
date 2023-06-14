@@ -1,6 +1,8 @@
 #include <iostream>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
+
 #include <tiffio.h>
 
 #include <OpenEXR/ImfRgbaFile.h>
@@ -23,9 +25,9 @@ int main(int argc, char *argv[]) {
     TIFF* tif = TIFFOpen(argv[1], "r");
 
     if (tif) {
-        uint32 w, h;
-        uint16 bps, spp;
-        uint16 config;
+        uint32_t w, h;
+        uint16_t bps, spp;
+        uint16_t config;
 
         TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
         TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
@@ -45,16 +47,16 @@ int main(int argc, char *argv[]) {
         Imf::Rgba* image = new Imf::Rgba[w*h];
 
         // Fill with 255 for non alpha
-        memset(image, 0xFF, w*h*4);
+        memset((char*)image, 0xFF, w * h * sizeof(Imf::Rgba));
 
         switch(config) {
         case PLANARCONFIG_CONTIG:
             switch(bps) {
             case 8:
-                for (uint32 row = 0; row < h; row++) {
+                for (uint32_t row = 0; row < h; row++) {
                     TIFFReadScanline(tif, buf, row, 0);
-                    uint8 *scanline = (uint8*)buf;
-                    for (uint32 col = 0; col < w; col++) {
+                    uint8_t *scanline = (uint8_t*)buf;
+                    for (uint32_t col = 0; col < w; col++) {
                         half *channels = (half*) (image  + (row * w + col));
                         channels[3] = 1.0;
                         if (spp >= 3) {
@@ -74,10 +76,10 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 16:
-                for (uint32 row = 0; row < h; row++) {
+                for (uint32_t row = 0; row < h; row++) {
                     TIFFReadScanline(tif, buf, row, 0);
-                    uint16 *scanline = (uint16*)buf;
-                    for (uint32 col = 0; col < w; col++) {
+                    uint16_t *scanline = (uint16_t*)buf;
+                    for (uint32_t col = 0; col < w; col++) {
                         half *channels = (half*) (image + (row * w + col));
                         channels[3] = 1.0;
                         if (spp >= 3) {
@@ -95,10 +97,10 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 32:
-                for (uint32 row = 0; row < h; row++) {
+                for (uint32_t row = 0; row < h; row++) {
                     TIFFReadScanline(tif, buf, row, 0);
-                    uint32 *scanline = (uint32*)buf;
-                    for (uint32 col = 0; col < w; col++) {
+                    uint32_t *scanline = (uint32_t*)buf;
+                    for (uint32_t col = 0; col < w; col++) {
                         half *channels = (half*) (image + (row * w + col));
                         channels[3] = 1.0;
                         for (int c = 0; c < spp; c++) {
@@ -119,10 +121,10 @@ int main(int argc, char *argv[]) {
             switch(bps) {
             case 8:
                 for (int c = 0; c < spp; c++) {
-                    for (uint32 row = 0; row < h; row++) {
+                    for (uint32_t row = 0; row < h; row++) {
                         TIFFReadScanline(tif, buf, row, c);
-                        uint8 *scanline = (uint8*)buf;
-                        for (uint32 col = 0; col < w; col++) {
+                        uint8_t *scanline = (uint8_t*)buf;
+                        for (uint32_t col = 0; col < w; col++) {
                             // Write to PNG
                             //image[4 * (row * w + col) + c] = scanline[spp * col + c];
                         }
@@ -131,10 +133,10 @@ int main(int argc, char *argv[]) {
                 break;
             case 16:
                 for (int c = 0; c < spp; c++) {
-                    for (uint32 row = 0; row < h; row++) {
+                    for (uint32_t row = 0; row < h; row++) {
                         TIFFReadScanline(tif, buf, row, c);
-                        uint8 *scanline = (uint8*)buf;
-                        for (uint32 col = 0; col < w; col++) {
+                        uint8_t *scanline = (uint8_t*)buf;
+                        for (uint32_t col = 0; col < w; col++) {
                             // Write to PNG
                             //image[4 * (row * w + col) + c] = scanline[spp * col + c] / 65535.0f;
                         }
@@ -143,10 +145,10 @@ int main(int argc, char *argv[]) {
                 break;
             case 32:
                 for (int c = 0; c < spp; c++) {
-                    for (uint32 row = 0; row < h; row++) {
+                    for (uint32_t row = 0; row < h; row++) {
                         TIFFReadScanline(tif, buf, row, c);
-                        uint8 *scanline = (uint8*)buf;
-                        for (uint32 col = 0; col < w; col++) {
+                        uint8_t *scanline = (uint8_t*)buf;
+                        for (uint32_t col = 0; col < w; col++) {
                             // Write to PNG
                             //image[4 * (row * w + col) + c] = scanline[spp * col + c] / 16777216;;
                         }
