@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 
 #include <tiffio.h>
 
@@ -63,13 +64,13 @@ int main(int argc, char *argv[]) {
                             for (int c = 0; c < spp; c++) {
                                 // Write to EXR
                                 // TODO: Convert sRGB to Linear RGB
-                                channels[c] = (half)scanline[spp * col + c] / 256.0f;
+                                channels[c] = (half)scanline[spp * col + c] / (half)std::numeric_limits<uint8_t>::max();
                             }
                         } else {
                             for (int c = 0; c < 3; c++) {
                                 // Write to EXR
                                 // TODO: Convert sRGB to Linear RGB
-                                channels[c] = (half)scanline[spp * col] / 256.0f;
+                                channels[c] = (half)scanline[spp * col] / (half)std::numeric_limits<uint8_t>::max();
                             }
                         }
                     }
@@ -85,12 +86,12 @@ int main(int argc, char *argv[]) {
                         if (spp >= 3) {
                             for (int c = 0; c < spp; c++) {
                                 // Write to EXR
-                                channels[c] = (half)scanline[spp * col + c] / 65536.0f;
+                                channels[c] = (half)scanline[spp * col + c] / (half)std::numeric_limits<uint16_t>::max();
                             }
                         } else {
                             for (int c = 0; c < 3; c++) {
                                 // Write to EXR
-                                channels[c] = (half)scanline[spp * col] / 65536.0f;
+                                channels[c] = (half)scanline[spp * col] / (half)std::numeric_limits<uint16_t>::max();
                             }
                         }
                     }
@@ -105,7 +106,7 @@ int main(int argc, char *argv[]) {
                         channels[3] = 1.0;
                         for (int c = 0; c < spp; c++) {
                             // Write to EXR
-                            channels[c] = (half)scanline[spp * col + c] / 4294967296.0f;
+                            channels[c] = (half)scanline[spp * col + c] / (half)std::numeric_limits<uint32_t>::max();
                         }
                     }
                 }
@@ -125,8 +126,7 @@ int main(int argc, char *argv[]) {
                         TIFFReadScanline(tif, buf, row, c);
                         uint8_t *scanline = (uint8_t*)buf;
                         for (uint32_t col = 0; col < w; col++) {
-                            // Write to PNG
-                            //image[4 * (row * w + col) + c] = scanline[spp * col + c];
+                            //image[4 * (row * w + col) + c] = (half)scanline[spp * col + c] / (half)std::numeric_limits<uint8_t>::max();
                         }
                     }
                 }
@@ -137,8 +137,7 @@ int main(int argc, char *argv[]) {
                         TIFFReadScanline(tif, buf, row, c);
                         uint16_t *scanline = (uint16_t*)buf;
                         for (uint32_t col = 0; col < w; col++) {
-                            // Write to PNG
-                            //image[4 * (row * w + col) + c] = scanline[spp * col + c] / 65535.0f;
+                            //image[4 * (row * w + col) + c] = (half)scanline[spp * col + c] / (half)std::numeric_limits<uint16_t>::max();
                         }
                     }
                 }
@@ -149,8 +148,7 @@ int main(int argc, char *argv[]) {
                         TIFFReadScanline(tif, buf, row, c);
                         uint32_t *scanline = (uint32_t*)buf;
                         for (uint32_t col = 0; col < w; col++) {
-                            // Write to PNG
-                            //image[4 * (row * w + col) + c] = scanline[spp * col + c] / 16777216;;
+                            //image[4 * (row * w + col) + c] = (half)scanline[spp * col + c] / (half)std::numeric_limits<uint32_t>::max();
                         }
                     }
                 }
