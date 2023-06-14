@@ -8,13 +8,17 @@
 
 #include <OpenEXR/ImfRgbaFile.h>
 
-void writeRgba(const char filename[], const Imf::Rgba* pixels, int width, int height) {
+
+void writeRgba(const char filename[], const Imf::Rgba* pixels, int width, int height)
+{
     Imf::RgbaOutputFile file(filename, width, height, Imf::WRITE_RGBA);
     file.setFrameBuffer(pixels, 1, width);
     file.writePixels(height);
 }
 
-int main(int argc, char *argv[]) {
+
+int main(int argc, char *argv[])
+{
     if (argc < 3) {
         std::cout << "Usage : " << std::endl
                   << argv[0] << " <input_tiff_file> <output_exr_file>" << std::endl;
