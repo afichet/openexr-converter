@@ -4,9 +4,13 @@ find_package(OpenEXR CONFIG)
 if (NOT OpenEXR_FOUND)
 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake/")
 	find_package(OpenEXR REQUIRED)
-else ()
-	set(OPENEXR_LIBRARIES OpenEXR::OpenEXR Imath::Imath Threads::Threads)
-endif ()
+else()
+	if (TARGET OpenEXR::OpenEXR)
+		set(OPENEXR_LIBRARIES OpenEXR::OpenEXR Imath::Imath)
+	else()
+		set(OPENEXR_LIBRARIES OpenEXR::IlmImf)
+	endif()
+endif()
 
 add_executable(exr-png
 	main.cpp
