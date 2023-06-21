@@ -328,8 +328,11 @@ int main(int argc, char *argv[])
 
     // TODO: double check this does also apply to > 8 bps images...
     //       in my experiments with RawThreapee, all TIFF are gamma mapped
-    for (size_t i = 0; i < width * height * spp; i++) {
-        output_buffer[i] = to_linear_RGB(output_buffer[i]);
+    for (size_t i = 0; i < width * height; i++) {
+        // Alpha shall not be touched
+        for (size_t c = 0; c < std::min(spp, (uint16_t)3); c++) {
+            output_buffer[spp * i + c] = to_linear_RGB(output_buffer[spp * i + c]);
+        }
     }
 
     try {
